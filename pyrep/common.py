@@ -1,7 +1,7 @@
 import math
 from .vrep import vrep as v
 
-class Vec3:
+class Coordinates:
 
     def __init__(self, x=0, y=0, z=0):
         self._x = x
@@ -21,7 +21,7 @@ class Vec3:
         return math.sqrt(self._x ** 2 + self._y ** 2 + self._z ** 2)
 
     def __str__(self):
-        return "Vec3(x={0}, y={1}, z={2})"\
+        return "Coordinates(x={0}, y={1}, z={2})"\
                .format(str(self._x), str(self._y), str(self._z))
 
     def __repr__(self):
@@ -53,18 +53,16 @@ class EulerAngles:
 
 
 class NotFoundComponentError(Exception):
-    def __init__(self, name):
+    def __init__(self, name, code):
         super(NotFoundComponentError, self).__init__(
-            "Not found component with name \"" + name +
-            "\"")
+            "Component with name \"" + name + "\" was not found. Error code:" + str(code))
 
 
 class MatchObjTypeError(Exception):
 
     def __init__(self, name):
         super(MatchObjTypeError, self).__init__(
-            "Component with name: \"" + name +
-            "\" does not fit the parameters.")
+            "Component with name: \"" + name + "\" does not fit the parameters.")
 
 
 class ReturnCommandError(Exception):

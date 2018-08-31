@@ -144,6 +144,7 @@ class SpringJoint:
     def set_target_velocity(self, target: float):
         self._any_joint.set_target_velocity(target)
 
+
 class Joints:
 
     def __init__(self, id):
@@ -216,14 +217,11 @@ class Joints:
 
     def _get_joint_with_param(self, name, types, mode) -> AnyJoint:
         handle = self._get_object_handle(name)
-        if handle is not None:
-            type, curr_mode, limit, range = self._get_info_about_joint(handle)
-            if type in types: #and curr_mode == mode:
-                return AnyJoint(self._id, handle)
-            else:
-                raise MatchObjTypeError(name)
+        type, curr_mode, limit, range = self._get_info_about_joint(handle)
+        if type in types: #and curr_mode == mode:
+            return AnyJoint(self._id, handle)
         else:
-            raise Exception("Handle not found")
+            raise MatchObjTypeError(name)
 
     def _get_info_about_joint(self, handle):
         obj_type_code = vc.sim_object_joint_type
@@ -231,9 +229,9 @@ class Joints:
         # in intData (2 values): joint type, joint mode (bit16=hybid operation
         # In floatData (2 values): joint limit low, joint range (-1.0 if joint is cyclic)
         data_type_code = 16
-        code, handles, types_and_mode, limits_and_ranges, _ = v.simxGetObjectGroupData(
+        code, _, types_and_mode, limits_and_ranges, _ = v.simxGetObjectGroupData(
             self._id, obj_type_code, data_type_code, self._def_op_mode)
-        if handle in handles:
+        if code == v.simx_return_ok:
             return types_and_mode[0], types_and_mode[1], limits_and_ranges[0], limits_and_ranges[1]
         else:
             raise ReturnCommandError(code)
@@ -243,4 +241,4 @@ class Joints:
         if code == v.simx_return_ok:
             return handle
         else:
-            raise ReturnCommandError(code)
+            raise NotFoundComponentError(name, code)
