@@ -1,4 +1,4 @@
-# v-rep python
+# V-Rep API Python
 
 Simple python binding for
 [Coppelia Robotics V-REP simulator](http://www.coppeliarobotics.com/) ([remote API](http://www.coppeliarobotics.com/helpFiles/en/remoteApiOverview.htm)) of version 3.3.0
@@ -6,23 +6,26 @@ Simple python binding for
 ## Getting started
 
 0. Requirements: CPython version >= 3.5.2, pip
-1. Install library from PyPI by entering this command:
-```bash
-[sudo] pip install 'git+https://github.com/Troxid/vrep-api-python'
+1. Import this library locally by entering this command:
+```python
+from pyrep.api import VRepApi
 ```
 
 ## V-Rep specific
-Package needs platform-specific native library (remoteApi). It uses two enviroment variables `VREP` and `VREP_LIBRARY`. If `VREP` is unspecified package will use default `/usr/share/vrep` for it. If `VREP_LIBRARY` is also unspecified, then it will concatenate `VREP` with `programming/remoteApiBindings/lib/lib/64Bit/`. This setup was test tested under **LINUX ONLY**. We are open for debug under Windows.
-    * For windows users:
-        *NOT TESTED*
+This package needs a platform-specific shared library (remoteApi). You can find it in `<V-Rep-Root>/programming/remoteApiBindings/lib/lib/Linux/64Bit/` and you need to copy it inside this repository to `./pyrep/vrep/`.
+
+This setup was tested under **LINUX ONLY**.    
+    * For windows users: *NOT TESTED*
     
-To use package you will need the socket port number, which can be located in `V-REP/remoteApiConnections.txt`.
+This package also needs the socket port number, which can be located in `<V-Rep-Root>/remoteApiConnections.txt`.
+
+Where `<V-Rep-Root>` is the root of V-Rep-Pro-Edu directory.
 
 ## Currently implemented things
 
-In the current version is not implemented features such as remote management GUI,
+The current version does not implement features such as remote management GUI,
 additional configuration properties of objects and shapes, etc.
-Basically implemented those components that are required to control the robot:
+Implemented components:
 * Joint
 * Proximity sensor
 * Vision sensor
@@ -33,12 +36,15 @@ Basically implemented those components that are required to control the robot:
 ## Example
 Designed to be used with `examples/Pioneer.ttt`.
 ```python
-from pyrep import VRep
 import time
+import sys
+
+sys.path.append("..")
+from pyrep.api import VRepApi
 
 class PioneerP3DX:
 
-    def __init__(self, api: VRep):
+    def __init__(self, api: VRepApi):
         self._api = api
         self._left_motor = api.joint.with_velocity_control("Pioneer_p3dx_leftMotor")
         self._right_motor = api.joint.with_velocity_control("Pioneer_p3dx_rightMotor")
@@ -67,7 +73,7 @@ class PioneerP3DX:
     def left_length(self):
         return self._left_sensor.read()[1].distance()
 
-with VRep.connect("127.0.0.1", 19997) as api:
+with VRepApi.connect("127.0.0.1", 19997) as api:
     r = PioneerP3DX(api)
     while True:
         rl = r.right_length()
@@ -79,7 +85,6 @@ with VRep.connect("127.0.0.1", 19997) as api:
         else:
             r.move_forward()
         time.sleep(0.1)
-
 ```
 
 

@@ -1,12 +1,16 @@
+#!/usr/bin/env python3
 import time
-from pyrep import VRep
-from math import *
+import sys
+from math import pi, sin
+sys.path.append("..")
+from pyrep.api import VRepApi
+
 # contextlib
 # simpy
 # multiprocessing cpu
 
 
-with VRep.connect("127.0.0.1", 19997) as vrep:
+with VRepApi.connect("127.0.0.1", 19997) as vrep:
 #    vrep.simulation.stop()
 #    time.sleep(2)
 #vrep.simulation.start()
@@ -22,7 +26,7 @@ with VRep.connect("127.0.0.1", 19997) as vrep:
 
     j_vel.set_target_velocity(2)
     j_spr.set_target_position(2)
-    
+
     for i in range(5):
         b = pi / 9
         j_pos.set_target_position(b * i + 0.2)
