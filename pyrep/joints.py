@@ -8,41 +8,60 @@ class AnyJoint:
         self._handle = handle
         self._def_op_mode = v.simx_opmode_oneshot_wait
 
-    def set_target_velocity(self, target):
-        v.simxSetJointTargetVelocity(
-            self._id, self._handle, target, self._def_op_mode)
-
-    def set_target_position(self, target):
-        v.simxSetJointTargetPosition(
-            self._id, self._handle, target, self._def_op_mode)
-
     def get_force(self):
         code, force = v.simxGetJointForce(
             self._id, self._handle, self._def_op_mode)
-        return force
-
-    def set_maximum_force(self, force):
-        v.simxSetJointForce(
-            self._id, self._handle, force, self._def_op_mode)
-
-    def set_position(self, position):
-        v.simxSetJointPosition(
-            self._id, self._handle, position, self._def_op_mode)
-
-    def get_position(self):
-        code, position = v.simxGetJointPosition(
-            self._id, self._handle, self._def_op_mode)
-        return position
+        if code == v.simx_return_ok:
+            return force
+        else:
+            raise Exception("Returned with code: " + str(code))
 
     def get_matrix(self):
         code, matrix = v.simxGetJointMatrix(
             self._id, self._handle, self._def_op_mode)
-        return matrix
+        if code == v.simx_return_ok:
+            return matrix
+        else:
+            raise Exception("Returned with code: " + str(code))
+
+    def get_position(self):
+        code, position = v.simxGetJointPosition(
+            self._id, self._handle, self._def_op_mode)
+        if code == v.simx_return_ok:
+            return position
+        else:
+            raise Exception("Returned with code: " + str(code))
+
+    def set_maximum_force(self, force):
+        code = v.simxSetJointForce(
+                self._id, self._handle, force, self._def_op_mode)
+        if code != v.simx_return_ok:
+            raise Exception("Returned with code: " + str(code))
+
+    def set_position(self, position):
+        code = v.simxSetJointPosition(
+                self._id, self._handle, position, self._def_op_mode)
+        if code != v.simx_return_ok:
+            raise Exception("Returned with code: " + str(code))
+
+    def set_target_position(self, target):
+        code = v.simxSetJointTargetPosition(
+                self._id, self._handle, target, self._def_op_mode)
+        if code != v.simx_return_ok:
+            raise Exception("Returned with code: " + str(code))
+
+    def set_target_velocity(self, target):
+        code = v.simxSetJointTargetVelocity(
+                self._id, self._handle, target, self._def_op_mode)
+        if code != v.simx_return_ok:
+            raise Exception("Returned with code: " + str(code))
 
     def set_matrix(self, matrix):
         assert len(matrix) == 12
-        v.simxSetSphericalJointMatrix(
-            self._id, self._handle, matrix, self._def_op_mode)
+        code = v.simxSetSphericalJointMatrix(
+                self._id, self._handle, matrix, self._def_op_mode)
+        if code != v.simx_return_ok:
+            raise Exception("Returned with code: " + str(code))
 
 
 class JointWithVelocityControl:

@@ -4,7 +4,6 @@ from .joints import Joints
 from .sensors import Sensors
 from .simulationstate import SimulationState
 
-
 class VRepApi:
     def __init__(self, id):
         self._id = id
@@ -15,17 +14,17 @@ class VRepApi:
 
     @staticmethod
     def connect(ip, port):
-        res = v.simxStart(
+        id = v.simxStart(
             connectionAddress=ip,
             connectionPort=port,
             waitUntilConnected=True,
             doNotReconnectOnceDisconnected=True,
             timeOutInMs=5000,
             commThreadCycleInMs=5)
-        if res == v.simx_return_ok:
-            return VRepApi(res)
+        if id == -1:
+            raise ReturnCommandError(id)
         else:
-            raise ReturnCommandError(res)
+            return VRepApi(id)
 
     def close_connection(self):
         v.simxFinish(self._id)
