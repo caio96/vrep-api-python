@@ -22,7 +22,7 @@ class VRepApi:
             timeOutInMs=5000,
             commThreadCycleInMs=5)
         if id == -1:
-            raise ReturnCommandError(id)
+            raise Exception("Could not connect")
         else:
             return VRepApi(id)
 

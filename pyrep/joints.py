@@ -1,6 +1,6 @@
 from .vrep import vrep as v
 from .vrep import vrepConst as vc
-from .common import NotFoundComponentError, MatchObjTypeError
+from .common import NotFoundComponentError, MatchObjTypeError, ReturnCommandError
 
 class AnyJoint:
     def __init__(self, id, handle):
@@ -14,7 +14,7 @@ class AnyJoint:
         if code == v.simx_return_ok:
             return force
         else:
-            raise Exception("Returned with code: " + str(code))
+            raise ReturnCommandError(code)
 
     def get_matrix(self):
         code, matrix = v.simxGetJointMatrix(
@@ -22,7 +22,7 @@ class AnyJoint:
         if code == v.simx_return_ok:
             return matrix
         else:
-            raise Exception("Returned with code: " + str(code))
+            raise ReturnCommandError(code)
 
     def get_position(self):
         code, position = v.simxGetJointPosition(
@@ -30,38 +30,38 @@ class AnyJoint:
         if code == v.simx_return_ok:
             return position
         else:
-            raise Exception("Returned with code: " + str(code))
+            raise ReturnCommandError(code)
 
     def set_maximum_force(self, force):
         code = v.simxSetJointForce(
                 self._id, self._handle, force, self._def_op_mode)
         if code != v.simx_return_ok:
-            raise Exception("Returned with code: " + str(code))
+            raise ReturnCommandError(code)
 
     def set_position(self, position):
         code = v.simxSetJointPosition(
                 self._id, self._handle, position, self._def_op_mode)
         if code != v.simx_return_ok:
-            raise Exception("Returned with code: " + str(code))
+            raise ReturnCommandError(code)
 
     def set_target_position(self, target):
         code = v.simxSetJointTargetPosition(
                 self._id, self._handle, target, self._def_op_mode)
         if code != v.simx_return_ok:
-            raise Exception("Returned with code: " + str(code))
+            raise ReturnCommandError(code)
 
     def set_target_velocity(self, target):
         code = v.simxSetJointTargetVelocity(
                 self._id, self._handle, target, self._def_op_mode)
         if code != v.simx_return_ok:
-            raise Exception("Returned with code: " + str(code))
+            raise ReturnCommandError(code)
 
     def set_matrix(self, matrix):
         assert len(matrix) == 12
         code = v.simxSetSphericalJointMatrix(
                 self._id, self._handle, matrix, self._def_op_mode)
         if code != v.simx_return_ok:
-            raise Exception("Returned with code: " + str(code))
+            raise ReturnCommandError(code)
 
 
 class JointWithVelocityControl:
@@ -160,7 +160,7 @@ class Joints:
             name,
             [vc.sim_joint_revolute_subtype,  # bug in v-rep: return revolute, instead spherical
              vc.sim_joint_revolute_subtype],  # bug in v-rep: return revolute, instead spherical
-            vc.sim_jointmode_passive)
+            vc.sim_jointmode_force)
         return SphericalJoint(joint)
 
     def spring(self, name: str) -> SpringJoint:
@@ -211,37 +211,36 @@ class Joints:
         """
         joint = self._get_joint_with_param(
             name, [vc.sim_joint_revolute_subtype, vc.sim_joint_prismatic_subtype],
-            vc.sim_jointmode_motion) # bug in v-rep: return motion, instead force
+            vc.sim_jointmode_force)
         return JointWithVelocityControl(joint)
 
     def _get_joint_with_param(self, name, types, mode) -> AnyJoint:
         handle = self._get_object_handle(name)
         if handle is not None:
             type, curr_mode, limit, range = self._get_info_about_joint(handle)
-            if type == types[0] or \
-               type == types[1] and \
-               curr_mode == mode:
+            if type in types: #and curr_mode == mode:
                 return AnyJoint(self._id, handle)
             else:
-                raise MatchObjTypeError("Joint with name: \"" + name +
-                                        "\" does not fit the parameters. ")
+                raise MatchObjTypeError(name)
         else:
-            raise NotFoundComponentError("Handle not found")
+            raise Exception("Handle not found")
 
     def _get_info_about_joint(self, handle):
         obj_type_code = vc.sim_object_joint_type
+        # 16: retrieves joint properties data
+        # in intData (2 values): joint type, joint mode (bit16=hybid operation
+        # In floatData (2 values): joint limit low, joint range (-1.0 if joint is cyclic)
         data_type_code = 16
-        code, handles, types_and_mode, limits_and_ranges, string_data = v.simxGetObjectGroupData(
+        code, handles, types_and_mode, limits_and_ranges, _ = v.simxGetObjectGroupData(
             self._id, obj_type_code, data_type_code, self._def_op_mode)
-        if handles.__contains__(handle):
+        if handle in handles:
             return types_and_mode[0], types_and_mode[1], limits_and_ranges[0], limits_and_ranges[1]
         else:
-            return None
+            raise ReturnCommandError(code)
 
     def _get_object_handle(self, name):
         code, handle = v.simxGetObjectHandle(self._id, name, self._def_op_mode)
         if code == v.simx_return_ok:
             return handle
         else:
-            return None
-
+            raise ReturnCommandError(code)
