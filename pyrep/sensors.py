@@ -44,10 +44,6 @@ class VisionSensor:
         Retrieves the image of a vision sensor.
         @return the image data
         """
-        num_of_clr = 3
-        if is_grey_scale:
-            num_of_clr = 1
-
         code, resolution, image = v.simxGetVisionSensorImage(
             self._id, self._handle, int(is_grey_scale), self._def_op_mode)
         if code == vc.simx_return_ok:
@@ -90,7 +86,7 @@ class ForceSensor:
             raise ReturnCommandError(code)
 
 
-class PositionSensor:
+class GroundTruthSensor:
 
     def __init__(self, id, handle):
         self._id = id
@@ -142,9 +138,9 @@ class Sensors:
         handle = self._get_object_handle(name)
         return ProximitySensor(self._id, handle)
 
-    def position(self, name: str) -> PositionSensor:
+    def ground_truth(self, name: str) -> GroundTruthSensor:
         handle = self._get_object_handle(name)
-        return PositionSensor(self._id, handle)
+        return GroundTruthSensor(self._id, handle)
 
     def vision(self, name: str) -> VisionSensor:
         handle = self._get_object_handle(name)
