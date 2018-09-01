@@ -70,19 +70,21 @@ class ReturnCommandError(Exception):
     def __init__(self, code):
         msg = ""
         if code == v.simx_return_novalue_flag:
-            msg = "Input buffer doesn't contain the specified command"
+            msg = "There is no command reply in the input buffer. This should not always be considered as an error, depending on the selected operation mode"
         elif code == v.simx_return_timeout_flag:
-            msg = "Command reply not received in time for opmode_oneshot_wait operation mode"
+            msg = "The function timed out (probably the network is down or too slow)"
         elif code == v.simx_return_illegal_opmode_flag:
-            msg = "Command doesn't support the specified operation mode"
+            msg = "The specified operation mode is not supported for the given function"
         elif code == v.simx_return_remote_error_flag:
-            msg = "Command caused an error on the server side"
+            msg = "The function caused an error on the server side (e.g. an invalid handle was specified)"
         elif code == v.simx_return_split_progress_flag:
-            msg = "Previous similar command not yet fully processed (applies to opmode_oneshot_split operation modes)"
+            msg = "The communication thread is still processing previous split command of the same type"
         elif code == v.simx_return_local_error_flag:
-            msg = "Command caused an error on the client side"
+            msg = "The function caused an error on the client side"
         elif code == v.simx_return_initialize_error_flag:
             msg = "simxStart was not yet called"
+        elif code == v.simx_return_ok:
+            msg = "The function executed fine, why is this an exception?"
         else:
             msg = "Undefined return code: " + str(code)
         super(ReturnCommandError, self).__init__(msg)
