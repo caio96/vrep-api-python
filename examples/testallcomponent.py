@@ -5,15 +5,7 @@ from math import pi, sin
 sys.path.append("..")
 from pyrep.api import VRepApi
 
-# contextlib
-# simpy
-# multiprocessing cpu
-
-
 with VRepApi.connect("127.0.0.1", 19997) as vrep:
-#    vrep.simulation.stop()
-#    time.sleep(2)
-#vrep.simulation.start()
 
     j_vel = vrep.joint.with_velocity_control("joint_force")
     j_pos = vrep.joint.with_position_control("joint_position")
@@ -43,7 +35,3 @@ with VRepApi.connect("127.0.0.1", 19997) as vrep:
              0, 0, 0, 0,
              v, 0, 0, 0])
         time.sleep(0.01)
-
-
-#vrep.simulation.stop()
-

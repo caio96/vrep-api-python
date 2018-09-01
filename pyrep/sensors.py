@@ -35,7 +35,7 @@ class VisionSensor:
         code, state, aux_packets = v.simxReadVisionSensor(
             self._id, self._handle, self._def_op_mode)
         if code == vc.simx_return_ok:
-            return state, state, aux_packets
+            return state, aux_packets
         else:
             raise ReturnCommandError(code)
 

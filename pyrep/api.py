@@ -2,7 +2,7 @@ from .vrep import vrep as v
 from .common import ReturnCommandError
 from .joints import Joints
 from .sensors import Sensors
-from .simulationstate import SimulationState
+from .simulation import Simulation
 
 class VRepApi:
     def __init__(self, id):
@@ -10,7 +10,7 @@ class VRepApi:
         self._def_op_mode = v.simx_opmode_oneshot_wait
         self.joint = Joints(id)  # type: Joints
         self.sensor = Sensors(id)  # type: Sensors
-        self.simulation = SimulationState(id)  # type: SimulationState
+        self.simulation = Simulation(id)  # type: Simulation
 
     @staticmethod
     def connect(ip, port):

@@ -21,7 +21,7 @@ class Coordinates:
         return math.sqrt(self._x ** 2 + self._y ** 2 + self._z ** 2)
 
     def __str__(self):
-        return "Coordinates(x={0}, y={1}, z={2})"\
+        return "(x={0}, y={1}, z={2})"\
                .format(str(self._x), str(self._y), str(self._z))
 
     def __repr__(self):
@@ -45,7 +45,7 @@ class EulerAngles:
         return self._gamma
 
     def __str__(self):
-        return "EulerAngles(alpha={0}, beta={1}, gamma={2})"\
+        return "(alpha={0}, beta={1}, gamma={2})"\
                .format(str(self._alpha), str(self._beta), str(self._gamma))
 
     def __repr__(self):

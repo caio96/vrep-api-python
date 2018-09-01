@@ -1,7 +1,7 @@
 from .vrep import vrep as v
 from .vrep import vrepConst as vc
 
-class SimulationState:
+class Simulation:
 
     def __init__(self, id):
         self._id = id
