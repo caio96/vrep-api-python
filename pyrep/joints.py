@@ -3,10 +3,18 @@ from .vrep import vrepConst as vc
 from .common import NotFoundComponentError, MatchObjTypeError, ReturnCommandError
 
 class AnyJoint:
-    def __init__(self, client_id, handle):
+    def __init__(self, client_id, handle, low_limit, joint_range):
         self._id = client_id
         self._handle = handle
+        self._low_limit = low_limit
+        self._range = joint_range
         self._def_op_mode = v.simx_opmode_oneshot_wait
+
+    def get_low_limit(self):
+        return self._low_limit
+
+    def get_range(self):
+        return self._range
 
     def get_force(self):
         code, force = v.simxGetJointForce(
@@ -152,13 +160,13 @@ class Joints:
         """
         Retrieves the joint with next parameters:
             * Joint type: Spherical
-            * Joint mode: Force
+            * Joint mode: Passive
         """
         joint = self._get_joint_with_param(
             name,
-            [vc.sim_joint_revolute_subtype,  # bug in v-rep: return revolute, instead spherical
-             vc.sim_joint_revolute_subtype],  # bug in v-rep: return revolute, instead spherical
-            vc.sim_jointmode_force)
+            [vc.sim_joint_spherical_subtype,
+             vc.sim_joint_spherical_subtype],
+            vc.sim_jointmode_passive)
         return SphericalJoint(joint)
 
     def spring(self, name: str) -> SpringJoint:
@@ -214,9 +222,9 @@ class Joints:
 
     def _get_joint_with_param(self, name, types, mode) -> AnyJoint:
         handle = self._get_object_handle(name)
-        joint_type, curr_mode, limit, joint_range = self._get_info_about_joint(handle)
-        if joint_type in types: #and curr_mode == mode:
-            return AnyJoint(self._id, handle)
+        joint_type, curr_mode, low_limit, joint_range = self._get_info_about_joint(handle)
+        if joint_type in types and curr_mode == mode:
+            return AnyJoint(self._id, handle, low_limit, joint_range)
         raise MatchObjTypeError(name)
 
     def _get_info_about_joint(self, handle):
@@ -225,10 +233,12 @@ class Joints:
         # in intData (2 values): joint type, joint mode (bit16=hybid operation
         # In floatData (2 values): joint limit low, joint range (-1.0 if joint is cyclic)
         data_type_code = 16
-        code, _, types_and_mode, limits_and_ranges, _ = v.simxGetObjectGroupData(
+        code, handles, types_and_mode, limits_and_ranges, _ = v.simxGetObjectGroupData(
             self._id, obj_type_code, data_type_code, self._def_op_mode)
+        index = handles.index(handle)
+        index = index * 2
         if code == v.simx_return_ok:
-            return types_and_mode[0], types_and_mode[1], limits_and_ranges[0], limits_and_ranges[1]
+            return types_and_mode[index], types_and_mode[index+1], limits_and_ranges[index], limits_and_ranges[index+1]
         raise ReturnCommandError(code)
 
     def _get_object_handle(self, name):
