@@ -5,8 +5,8 @@ from .common import Coordinates, EulerAngles
 
 class ProximitySensor:
 
-    def __init__(self, id, handle):
-        self._id = id
+    def __init__(self, client_id, handle):
+        self._id = client_id
         self._handle = handle
         self._def_op_mode = v.simx_opmode_oneshot_wait
 
@@ -20,14 +20,13 @@ class ProximitySensor:
             self._id, self._handle, self._def_op_mode)
         if code == vc.simx_return_ok:
             return state, Coordinates(point[0], point[1], point[2])
-        else:
-            raise ReturnCommandError(code)
+        raise ReturnCommandError(code)
 
 
 class VisionSensor:
 
-    def __init__(self, id, handle):
-        self._id = id
+    def __init__(self, client_id, handle):
+        self._id = client_id
         self._handle = handle
         self._def_op_mode = v.simx_opmode_oneshot_wait
 
@@ -36,8 +35,7 @@ class VisionSensor:
             self._id, self._handle, self._def_op_mode)
         if code == vc.simx_return_ok:
             return state, aux_packets
-        else:
-            raise ReturnCommandError(code)
+        raise ReturnCommandError(code)
 
     def raw_image(self, is_grey_scale=False):
         """
@@ -48,8 +46,7 @@ class VisionSensor:
             self._id, self._handle, int(is_grey_scale), self._def_op_mode)
         if code == vc.simx_return_ok:
             return image
-        else:
-            raise ReturnCommandError(code)
+        raise ReturnCommandError(code)
 
 
     def depth_buffer(self):
@@ -60,14 +57,13 @@ class VisionSensor:
             self._id, self._handle, self._def_op_mode)
         if code == vc.simx_return_ok:
             return buffer
-        else:
-            raise ReturnCommandError(code)
+        raise ReturnCommandError(code)
 
 
 class ForceSensor:
 
-    def __init__(self, id, handle):
-        self._id = id
+    def __init__(self, client_id, handle):
+        self._id = client_id
         self._handle = handle
         self._def_op_mode = v.simx_opmode_oneshot_wait
 
@@ -82,14 +78,13 @@ class ForceSensor:
         torque_vector = Coordinates(torque[0], torque[1], torque[2])
         if code == vc.simx_return_ok:
             return state, force_vector, torque_vector
-        else:
-            raise ReturnCommandError(code)
+        raise ReturnCommandError(code)
 
 
 class GroundTruthSensor:
 
-    def __init__(self, id, handle):
-        self._id = id
+    def __init__(self, client_id, handle):
+        self._id = client_id
         self._handle = handle
         self._def_op_mode = v.simx_opmode_oneshot_wait
 
@@ -100,8 +95,7 @@ class GroundTruthSensor:
         code, pos = v.simxGetObjectPosition(self._id, self._handle, -1, self._def_op_mode)
         if code == vc.simx_return_ok:
             return Coordinates(pos[0], pos[1], pos[2])
-        else:
-            raise ReturnCommandError(code)
+        raise ReturnCommandError(code)
 
     def get_orientation(self) -> EulerAngles:
         """
@@ -111,8 +105,7 @@ class GroundTruthSensor:
         code, orient = v.simxGetObjectOrientation(self._id, self._handle, -1, self._def_op_mode)
         if code == vc.simx_return_ok:
             return EulerAngles(orient[0], orient[1], orient[2])
-        else:
-            raise ReturnCommandError(code)
+        raise ReturnCommandError(code)
 
     def get_velocity(self) -> (Coordinates, EulerAngles):
         """
@@ -124,14 +117,13 @@ class GroundTruthSensor:
         angular_velocity = EulerAngles(ang_vel[0], ang_vel[1], ang_vel[2])
         if code == vc.simx_return_ok:
             return linear_velocity, angular_velocity
-        else:
-            raise ReturnCommandError(code)
+        raise ReturnCommandError(code)
 
 
 class Sensors:
 
-    def __init__(self, id):
-        self._id = id
+    def __init__(self, client_id):
+        self._id = client_id
         self._def_op_mode = v.simx_opmode_oneshot_wait
 
     def proximity(self, name: str) -> ProximitySensor:
@@ -154,5 +146,4 @@ class Sensors:
         code, handle = v.simxGetObjectHandle(self._id, name, self._def_op_mode)
         if code == v.simx_return_ok:
             return handle
-        else:
-            raise NotFoundComponentError(name, code)
+        raise NotFoundComponentError(name, code)

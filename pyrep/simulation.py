@@ -4,8 +4,8 @@ from .common import ReturnCommandError
 
 class Simulation:
 
-    def __init__(self, id):
-        self._id = id
+    def __init__(self, client_id):
+        self._id = client_id
         self._def_op_mode = v.simx_opmode_oneshot_wait
 
     def start(self):
@@ -42,8 +42,7 @@ class Simulation:
         code, time = v.simxGetPingTime(self._id)
         if code == vc.simx_return_ok:
             return time
-        else:
-            raise ReturnCommandError(code)
+        raise ReturnCommandError(code)
 
     def last_cmd_time(self):
         time = v.simxGetLastCmdTime(self._id)

@@ -13,7 +13,7 @@ class PioneerP3DX:
         self._left_motor = api.joint.with_velocity_control("Pioneer_p3dx_leftMotor")
         self._right_motor = api.joint.with_velocity_control("Pioneer_p3dx_rightMotor")
         self._sonar_sensors = []
-        for i in range(1,17):
+        for i in range(1, 17):
             self._sonar_sensors.append(api.sensor.proximity("Pioneer_p3dx_ultrasonicSensor" + str(i)))
 
     def rotate_right(self, speed=2.0):
@@ -36,8 +36,7 @@ class PioneerP3DX:
         state, coordinate = self._sonar_sensors[sensor_number].read()
         if state == 0:
             return -1
-        else:
-            return coordinate.get_z()
+        return coordinate.get_z()
 
     def get_position(self):
         return self._ground_truth.get_position()
@@ -51,9 +50,9 @@ if __name__ == "__main__":
             rl = pioneer.sensor_distance(6)
             ll = pioneer.sensor_distance(3)
 
-            if rl > 0.01 and rl < 1:
+            if 0.01 < rl < 1:
                 pioneer.rotate_left()
-            elif ll > 0.01 and ll < 1:
+            elif 0.01 < ll < 1:
                 pioneer.rotate_right()
             else:
                 pioneer.move_forward()

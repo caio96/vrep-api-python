@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import sys
+import time
 sys.path.append("..")
 from pyrep.api import VRepApi
 from pyrep.sensors import VisionSensor
-import time
 
 class PioneerP3DX:
 
@@ -56,4 +56,3 @@ with VRepApi.connect("127.0.0.1", 19997) as api:
             robot.move_forward(0.3)
 
         time.sleep(0.01)
-
