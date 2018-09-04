@@ -164,8 +164,7 @@ class Joints:
         """
         joint = self._get_joint_with_param(
             name,
-            [vc.sim_joint_spherical_subtype,
-             vc.sim_joint_spherical_subtype],
+            [vc.sim_joint_spherical_subtype],
             vc.sim_jointmode_passive)
         return SphericalJoint(joint)
 
@@ -235,9 +234,9 @@ class Joints:
         data_type_code = 16
         code, handles, types_and_mode, limits_and_ranges, _ = v.simxGetObjectGroupData(
             self._id, obj_type_code, data_type_code, self._def_op_mode)
-        index = handles.index(handle)
-        index = index * 2
         if code == v.simx_return_ok:
+            index = handles.index(handle)
+            index = index * 2
             return types_and_mode[index], types_and_mode[index+1], limits_and_ranges[index], limits_and_ranges[index+1]
         raise ReturnCommandError(code)
 
