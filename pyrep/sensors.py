@@ -1,3 +1,4 @@
+import numpy as np
 from .vrep import vrep as v
 from .vrep import vrepConst as vc
 from .common import NotFoundComponentError, ReturnCommandError
@@ -40,14 +41,18 @@ class VisionSensor:
     def raw_image(self, is_grey_scale=False):
         """
         Retrieves the image of a vision sensor.
-        @return the image data
+        @return the image as a numpy array
         """
-        code, resolution, image = v.simxGetVisionSensorImage(
+        code, resolution, image_flat = v.simxGetVisionSensorImage(
             self._id, self._handle, int(is_grey_scale), self._def_op_mode)
         if code == vc.simx_return_ok:
+            image_flat = np.asarray(image_flat, dtype=np.uint8)
+            if not is_grey_scale:
+                resolution.append(3)
+            image = image_flat.reshape(tuple(resolution))
+            image = np.rot90(image,2)
             return image
         raise ReturnCommandError(code)
-
 
     def depth_buffer(self):
         """
