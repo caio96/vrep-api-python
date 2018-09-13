@@ -8,7 +8,6 @@ class AnyJoint:
         self._handle = handle
         self._low_limit = low_limit
         self._range = joint_range
-        self._def_op_mode = v.simx_opmode_oneshot_wait
 
     def get_low_limit(self):
         return self._low_limit
@@ -18,54 +17,54 @@ class AnyJoint:
 
     def get_force(self):
         code, force = v.simxGetJointForce(
-            self._id, self._handle, self._def_op_mode)
-        if code == v.simx_return_ok:
+            self._id, self._handle, vc.simx_opmode_streaming)
+        if code == v.simx_return_ok or code == vc.simx_return_novalue_flag:
             return force
         raise ReturnCommandError(code)
 
     def get_matrix(self):
         code, matrix = v.simxGetJointMatrix(
-            self._id, self._handle, self._def_op_mode)
-        if code == v.simx_return_ok:
+            self._id, self._handle, vc.simx_opmode_streaming)
+        if code == v.simx_return_ok or code == vc.simx_return_novalue_flag:
             return matrix
         raise ReturnCommandError(code)
 
     def get_position(self):
         code, position = v.simxGetJointPosition(
-            self._id, self._handle, self._def_op_mode)
-        if code == v.simx_return_ok:
+            self._id, self._handle, vc.simx_opmode_streaming)
+        if code == v.simx_return_ok or code == vc.simx_return_novalue_flag:
             return position
         raise ReturnCommandError(code)
 
     def set_maximum_force(self, force):
         code = v.simxSetJointForce(
-            self._id, self._handle, force, self._def_op_mode)
-        if code != v.simx_return_ok:
+            self._id, self._handle, force, vc.simx_opmode_oneshot)
+        if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
     def set_position(self, position):
         code = v.simxSetJointPosition(
-            self._id, self._handle, position, self._def_op_mode)
-        if code != v.simx_return_ok:
+            self._id, self._handle, position, vc.simx_opmode_streaming)
+        if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
     def set_target_position(self, target):
         code = v.simxSetJointTargetPosition(
-            self._id, self._handle, target, self._def_op_mode)
-        if code != v.simx_return_ok:
+            self._id, self._handle, target, vc.simx_opmode_streaming)
+        if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
     def set_target_velocity(self, target):
         code = v.simxSetJointTargetVelocity(
-            self._id, self._handle, target, self._def_op_mode)
-        if code != v.simx_return_ok:
+            self._id, self._handle, target, vc.simx_opmode_streaming)
+        if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
     def set_matrix(self, matrix):
         assert len(matrix) == 12
         code = v.simxSetSphericalJointMatrix(
-            self._id, self._handle, matrix, self._def_op_mode)
-        if code != v.simx_return_ok:
+            self._id, self._handle, matrix, vc.simx_opmode_streaming)
+        if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
 
@@ -154,7 +153,6 @@ class Joints:
 
     def __init__(self, client_id):
         self._id = client_id
-        self._def_op_mode = v.simx_opmode_oneshot_wait
 
     def spherical(self, name: str) -> SphericalJoint:
         """
@@ -233,7 +231,7 @@ class Joints:
         # In floatData (2 values): joint limit low, joint range (-1.0 if joint is cyclic)
         data_type_code = 16
         code, handles, types_and_mode, limits_and_ranges, _ = v.simxGetObjectGroupData(
-            self._id, obj_type_code, data_type_code, self._def_op_mode)
+            self._id, obj_type_code, data_type_code, vc.simx_opmode_oneshot_wait)
         if code == v.simx_return_ok:
             index = handles.index(handle)
             index = index * 2
@@ -241,7 +239,7 @@ class Joints:
         raise ReturnCommandError(code)
 
     def _get_object_handle(self, name):
-        code, handle = v.simxGetObjectHandle(self._id, name, self._def_op_mode)
+        code, handle = v.simxGetObjectHandle(self._id, name, vc.simx_opmode_oneshot_wait)
         if code == v.simx_return_ok:
             return handle
         raise NotFoundComponentError(name, code)

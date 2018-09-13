@@ -28,6 +28,9 @@ class PioneerP3DX:
     def move_backward(self, speed=2.0):
         self._move(-speed, -speed)
 
+    def stop_moving(self):
+        self._move(0, 0)
+
     def _move(self, left: float, right: float):
         self._left_motor.set_target_velocity(left)
         self._right_motor.set_target_velocity(right)
@@ -36,7 +39,7 @@ class PioneerP3DX:
         state, coordinate = self._sonar_sensors[sensor_number].read()
         if state == 0:
             return -1
-        return coordinate.get_z()
+        return coordinate.z
 
     def get_position(self):
         return self._ground_truth.get_position()

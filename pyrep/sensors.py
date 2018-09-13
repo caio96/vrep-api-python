@@ -9,7 +9,6 @@ class ProximitySensor:
     def __init__(self, client_id, handle):
         self._id = client_id
         self._handle = handle
-        self._def_op_mode = v.simx_opmode_oneshot_wait
 
     def read(self) -> (bool, Coordinates):
         """
@@ -17,9 +16,9 @@ class ProximitySensor:
         @return detection state and detected point
         @rtype (bool, Coordinates)
         """
-        code, state, point, handle, snv = v.simxReadProximitySensor(
-            self._id, self._handle, self._def_op_mode)
-        if code == vc.simx_return_ok:
+        code, state, point, _, _ = v.simxReadProximitySensor(
+            self._id, self._handle, vc.simx_opmode_streaming)
+        if code == vc.simx_return_ok or code == vc.simx_return_novalue_flag:
             return state, Coordinates(point[0], point[1], point[2])
         raise ReturnCommandError(code)
 
@@ -29,12 +28,11 @@ class VisionSensor:
     def __init__(self, client_id, handle):
         self._id = client_id
         self._handle = handle
-        self._def_op_mode = v.simx_opmode_oneshot_wait
 
     def read(self):
         code, state, aux_packets = v.simxReadVisionSensor(
-            self._id, self._handle, self._def_op_mode)
-        if code == vc.simx_return_ok:
+            self._id, self._handle, vc.simx_opmode_streaming)
+        if code == vc.simx_return_ok or code == vc.simx_return_novalue_flag:
             return state, aux_packets
         raise ReturnCommandError(code)
 
@@ -44,7 +42,7 @@ class VisionSensor:
         @return the image as a numpy array
         """
         code, resolution, image_flat = v.simxGetVisionSensorImage(
-            self._id, self._handle, int(is_grey_scale), self._def_op_mode)
+            self._id, self._handle, int(is_grey_scale), vc.simx_opmode_streaming)
         if code == vc.simx_return_ok:
             image_flat = np.asarray(image_flat, dtype=np.uint8)
             if not is_grey_scale:
@@ -52,6 +50,8 @@ class VisionSensor:
             image = image_flat.reshape(tuple(resolution))
             image = np.rot90(image,2)
             return image
+        elif code == vc.simx_return_novalue_flag:
+            return None
         raise ReturnCommandError(code)
 
     def depth_buffer(self):
@@ -59,8 +59,8 @@ class VisionSensor:
         Retrieves the depth buffer of a vision sensor.
         """
         code, resolution, buffer = v.simxGetVisionSensorDepthBuffer(
-            self._id, self._handle, self._def_op_mode)
-        if code == vc.simx_return_ok:
+            self._id, self._handle, vc.simx_opmode_streaming)
+        if code == vc.simx_return_ok or code == vc.simx_return_novalue_flag:
             return buffer
         raise ReturnCommandError(code)
 
@@ -70,7 +70,6 @@ class ForceSensor:
     def __init__(self, client_id, handle):
         self._id = client_id
         self._handle = handle
-        self._def_op_mode = v.simx_opmode_oneshot_wait
 
     def read(self) -> (bool, Coordinates, Coordinates):
         """
@@ -78,10 +77,10 @@ class ForceSensor:
         (filtered values are read), and its current state ('unbroken' or 'broken').
         """
         code, state, force, torque = v.simxReadForceSensor(
-            self._id, self._handle, self._def_op_mode)
+            self._id, self._handle, vc.simx_opmode_streaming)
         force_vector = Coordinates(force[0], force[1], force[2])
         torque_vector = Coordinates(torque[0], torque[1], torque[2])
-        if code == vc.simx_return_ok:
+        if code == vc.simx_return_ok or code == vc.simx_return_novalue_flag:
             return state, force_vector, torque_vector
         raise ReturnCommandError(code)
 
@@ -91,14 +90,13 @@ class GroundTruthSensor:
     def __init__(self, client_id, handle):
         self._id = client_id
         self._handle = handle
-        self._def_op_mode = v.simx_opmode_oneshot_wait
 
     def get_position(self) -> Coordinates:
         """Retrieves the orientation.
         @rtype: Coordinates
         """
-        code, pos = v.simxGetObjectPosition(self._id, self._handle, -1, self._def_op_mode)
-        if code == vc.simx_return_ok:
+        code, pos = v.simxGetObjectPosition(self._id, self._handle, -1, vc.simx_opmode_streaming)
+        if code == vc.simx_return_ok or code == vc.simx_return_novalue_flag:
             return Coordinates(pos[0], pos[1], pos[2])
         raise ReturnCommandError(code)
 
@@ -107,8 +105,8 @@ class GroundTruthSensor:
         Retrieves the linear and angular velocity.
         @rtype EulerAngles
         """
-        code, orient = v.simxGetObjectOrientation(self._id, self._handle, -1, self._def_op_mode)
-        if code == vc.simx_return_ok:
+        code, orient = v.simxGetObjectOrientation(self._id, self._handle, -1, vc.simx_opmode_streaming)
+        if code == vc.simx_return_ok or code == vc.simx_return_novalue_flag:
             return EulerAngles(orient[0], orient[1], orient[2])
         raise ReturnCommandError(code)
 
@@ -117,10 +115,10 @@ class GroundTruthSensor:
         Retrieves the linear and angular velocity.
         @rtype (Coordinates, EulerAngles)
         """
-        code, lin_vel, ang_vel = v.simxGetObjectVelocity(self._id, self._handle, self._def_op_mode)
+        code, lin_vel, ang_vel = v.simxGetObjectVelocity(self._id, self._handle, vc.simx_opmode_streaming)
         linear_velocity = Coordinates(lin_vel[0], lin_vel[1], lin_vel[2])
         angular_velocity = EulerAngles(ang_vel[0], ang_vel[1], ang_vel[2])
-        if code == vc.simx_return_ok:
+        if code == vc.simx_return_ok or code == vc.simx_return_novalue_flag:
             return linear_velocity, angular_velocity
         raise ReturnCommandError(code)
 
@@ -129,7 +127,6 @@ class Sensors:
 
     def __init__(self, client_id):
         self._id = client_id
-        self._def_op_mode = v.simx_opmode_oneshot_wait
 
     def proximity(self, name: str) -> ProximitySensor:
         handle = self._get_object_handle(name)
@@ -148,7 +145,7 @@ class Sensors:
         return ForceSensor(self._id, handle)
 
     def _get_object_handle(self, name):
-        code, handle = v.simxGetObjectHandle(self._id, name, self._def_op_mode)
+        code, handle = v.simxGetObjectHandle(self._id, name, vc.simx_opmode_oneshot_wait)
         if code == v.simx_return_ok:
             return handle
         raise NotFoundComponentError(name, code)

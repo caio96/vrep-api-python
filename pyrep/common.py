@@ -4,25 +4,16 @@ from .vrep import vrep as v
 class Coordinates:
 
     def __init__(self, x=0, y=0, z=0):
-        self._x = x
-        self._y = y
-        self._z = z
-
-    def get_x(self):
-        return self._x
-
-    def get_y(self):
-        return self._y
-
-    def get_z(self):
-        return self._z
+        self.x = x
+        self.y = y
+        self.z = z
 
     def distance(self):
-        return math.sqrt(self._x ** 2 + self._y ** 2 + self._z ** 2)
+        return math.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
 
     def __str__(self):
         return "(x={0}, y={1}, z={2})"\
-               .format(str(self._x), str(self._y), str(self._z))
+               .format(str(self.x), str(self.y), str(self.z))
 
     def __repr__(self):
         return self.__str__()
@@ -31,22 +22,13 @@ class Coordinates:
 class EulerAngles:
 
     def __init__(self, alpha=0, beta=0, gamma=0):
-        self._alpha = alpha
-        self._beta = beta
-        self._gamma = gamma
-
-    def get_alpha(self):
-        return self._alpha
-
-    def get_beta(self):
-        return self._beta
-
-    def get_gamma(self):
-        return self._gamma
+        self.alpha = alpha
+        self.beta = beta
+        self.gamma = gamma
 
     def __str__(self):
         return "(alpha={0}, beta={1}, gamma={2})"\
-               .format(str(self._alpha), str(self._beta), str(self._gamma))
+               .format(str(self.alpha), str(self.beta), str(self.gamma))
 
     def __repr__(self):
         return self.__str__()

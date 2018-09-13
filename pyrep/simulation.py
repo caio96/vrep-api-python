@@ -6,26 +6,25 @@ class Simulation:
 
     def __init__(self, client_id):
         self._id = client_id
-        self._def_op_mode = v.simx_opmode_oneshot_wait
 
     def start(self):
-        code = v.simxStartSimulation(self._id, self._def_op_mode)
-        if code != vc.simx_return_ok:
+        code = v.simxStartSimulation(self._id, vc.simx_opmode_oneshot_wait)
+        if code != vc.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
     def resume(self):
-        code = v.simxPauseSimulation(self._id, self._def_op_mode)
-        if code != vc.simx_return_ok:
+        code = v.simxPauseSimulation(self._id, vc.simx_opmode_oneshot_wait)
+        if code != vc.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
     def pause(self):
-        code = v.simxPauseSimulation(self._id, self._def_op_mode)
-        if code != vc.simx_return_ok:
+        code = v.simxPauseSimulation(self._id, vc.simx_opmode_oneshot_wait)
+        if code != vc.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
     def stop(self):
-        code = v.simxStopSimulation(self._id, self._def_op_mode)
-        if code != vc.simx_return_ok:
+        code = v.simxStopSimulation(self._id, vc.simx_opmode_oneshot_wait)
+        if code != vc.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
     def resume_communication(self):

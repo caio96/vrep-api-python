@@ -31,13 +31,19 @@ class PioneerP3DX:
         self.set_two_motor(-speed, -speed)
 
     def right_color(self) -> int:
-        image = self._right_sensor.raw_image(is_grey_scale=True)  # type: List[int]
-        average = sum(image) / len(image)
+        image = None
+        while image is None:
+            image = self._right_sensor.raw_image(is_grey_scale=True)  # type: List[int]
+            time.sleep(0.1)
+        average = image.sum() / image.size
         return average
 
     def left_color(self) -> int:
-        image = self._left_sensor.raw_image(is_grey_scale=True)  # type: List[int]
-        average = sum(image) / len(image)
+        image = None
+        while image is None:
+            image = self._left_sensor.raw_image(is_grey_scale=True)  # type: List[int]
+            time.sleep(0.1)
+        average = image.sum() / image.size
         return average
 
 
@@ -48,11 +54,11 @@ with VRepApi.connect("127.0.0.1", 19997) as api:
     while True:
         lclr = robot.left_color()
         rclr = robot.right_color()
-        if lclr > 10:
+        if lclr < 100:
             robot.rotate_left(0.3)
-        if rclr > 10:
+        elif rclr < 100:
             robot.rotate_right(0.3)
-        if lclr < -20 and rclr < -20:
+        else:
             robot.move_forward(0.3)
 
         time.sleep(0.01)
