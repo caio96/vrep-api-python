@@ -46,3 +46,9 @@ class Simulation:
     def last_cmd_time(self):
         time = v.simxGetLastCmdTime(self._id)
         return time
+
+    def get_float_signal(self, signal_name):
+        code, signal = v.simxGetFloatSignal(self._id, signal_name , vc.simx_opmode_streaming)
+        if code == vc.simx_return_ok or code == vc.simx_return_novalue_flag:
+            return signal
+        raise ReturnCommandError(code)

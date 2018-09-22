@@ -123,6 +123,37 @@ class GroundTruthSensor:
         raise ReturnCommandError(code)
 
 
+class LaserScanner2d:
+
+    """
+    Class for model '2d Laser Scanner.ttm'
+    Add the following lines to the child script of the laser scanner:
+
+    data=simPackFloats(points)
+    simSetStringSignal("LaserScanner2dData", data)
+    """
+
+    def __init__(self, client_id, handle, signal_name=None):
+        self._id = client_id
+        self._handle = handle
+        if signal_name is not None:
+            self._signal_name = signal_name
+        else:
+            self._signal_name = "LaserScanner2dData"
+
+    def read(self):
+        code, signal = v.simxGetStringSignal(self._id, self._signal_name, vc.simx_opmode_streaming)
+        if code == vc.simx_return_ok:
+            readings = v.simxUnpackFloats(signal)
+            points = []
+            for i in range(0, len(readings), 3):
+                points.append(Coordinates(readings[i], readings[i+1], readings[i+2]))
+            return points
+        elif code == vc.simx_return_novalue_flag:
+            return None
+        raise ReturnCommandError(code)
+
+
 class Sensors:
 
     def __init__(self, client_id):
@@ -143,6 +174,10 @@ class Sensors:
     def force(self, name: str) -> ForceSensor:
         handle = self._get_object_handle(name)
         return ForceSensor(self._id, handle)
+
+    def laser_scanner_2d(self, name: str, signal_name: str=None):
+        handle = self._get_object_handle(name)
+        return LaserScanner2d(self._id, handle, signal_name)
 
     def _get_object_handle(self, name):
         code, handle = v.simxGetObjectHandle(self._id, name, vc.simx_opmode_oneshot_wait)
