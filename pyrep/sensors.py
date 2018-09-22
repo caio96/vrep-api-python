@@ -48,7 +48,7 @@ class VisionSensor:
             if not is_grey_scale:
                 resolution.append(3)
             image = image_flat.reshape(tuple(resolution))
-            image = np.rot90(image,2)
+            image = np.rot90(image, 2)
             return image
         elif code == vc.simx_return_novalue_flag:
             return None

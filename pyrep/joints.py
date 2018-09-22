@@ -15,55 +15,71 @@ class AnyJoint:
     def get_range(self):
         return self._range
 
-    def get_force(self):
+    def get_force(self, op_mode=None):
+        if op_mode is None:
+            op_mode = vc.simx_opmode_streaming
         code, force = v.simxGetJointForce(
-            self._id, self._handle, vc.simx_opmode_streaming)
+            self._id, self._handle, op_mode)
         if code == v.simx_return_ok or code == vc.simx_return_novalue_flag:
             return force
         raise ReturnCommandError(code)
 
-    def get_matrix(self):
+    def get_matrix(self, op_mode=None):
+        if op_mode is None:
+            op_mode = vc.simx_opmode_streaming
         code, matrix = v.simxGetJointMatrix(
-            self._id, self._handle, vc.simx_opmode_streaming)
+            self._id, self._handle, op_mode)
         if code == v.simx_return_ok or code == vc.simx_return_novalue_flag:
             return matrix
         raise ReturnCommandError(code)
 
-    def get_position(self):
+    def get_position(self, op_mode=None):
+        if op_mode is None:
+            op_mode = vc.simx_opmode_streaming
         code, position = v.simxGetJointPosition(
-            self._id, self._handle, vc.simx_opmode_streaming)
+            self._id, self._handle, op_mode)
         if code == v.simx_return_ok or code == vc.simx_return_novalue_flag:
             return position
         raise ReturnCommandError(code)
 
-    def set_maximum_force(self, force):
+    def set_maximum_force(self, force, op_mode=None):
+        if op_mode is None:
+            op_mode = vc.simx_opmode_oneshot
         code = v.simxSetJointForce(
-            self._id, self._handle, force, vc.simx_opmode_oneshot)
+            self._id, self._handle, force, op_mode)
         if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
-    def set_position(self, position):
+    def set_position(self, position, op_mode=None):
+        if op_mode is None:
+            op_mode = vc.simx_opmode_streaming
         code = v.simxSetJointPosition(
-            self._id, self._handle, position, vc.simx_opmode_streaming)
+            self._id, self._handle, position, op_mode)
         if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
-    def set_target_position(self, target):
+    def set_target_position(self, target, op_mode=None):
+        if op_mode is None:
+            op_mode = vc.simx_opmode_streaming
         code = v.simxSetJointTargetPosition(
-            self._id, self._handle, target, vc.simx_opmode_streaming)
+            self._id, self._handle, target, op_mode)
         if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
-    def set_target_velocity(self, target):
+    def set_target_velocity(self, target, op_mode=None):
+        if op_mode is None:
+            op_mode = vc.simx_opmode_streaming
         code = v.simxSetJointTargetVelocity(
-            self._id, self._handle, target, vc.simx_opmode_streaming)
+            self._id, self._handle, target, op_mode)
         if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
-    def set_matrix(self, matrix):
+    def set_matrix(self, matrix, op_mode=None):
+        if op_mode is None:
+            op_mode = vc.simx_opmode_streaming
         assert len(matrix) == 12
         code = v.simxSetSphericalJointMatrix(
-            self._id, self._handle, matrix, vc.simx_opmode_streaming)
+            self._id, self._handle, matrix, op_mode)
         if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
             raise ReturnCommandError(code)
 
@@ -73,17 +89,17 @@ class JointWithVelocityControl:
     def __init__(self, any_joint: AnyJoint):
         self._any_joint = any_joint
 
-    def set_target_velocity(self, target: float):
-        self._any_joint.set_target_velocity(target)
+    def set_target_velocity(self, target: float, op_mode=None):
+        self._any_joint.set_target_velocity(target, op_mode)
 
-    def set_maximum_force(self, force: float):
-        self._any_joint.set_maximum_force(force)
+    def set_maximum_force(self, force: float, op_mode=None):
+        self._any_joint.set_maximum_force(force, op_mode)
 
-    def get_position(self):
-        return self._any_joint.get_position()
+    def get_position(self, op_mode=None):
+        return self._any_joint.get_position(op_mode)
 
-    def get_force(self):
-        return self._any_joint.get_force()
+    def get_force(self, op_mode=None):
+        return self._any_joint.get_force(op_mode)
 
 
 class JointWithPositionControl:
@@ -91,17 +107,17 @@ class JointWithPositionControl:
     def __init__(self, any_joint: AnyJoint):
         self._any_joint = any_joint
 
-    def set_target_position(self, target: float):
-        self._any_joint.set_target_position(target)
+    def set_target_position(self, target: float, op_mode=None):
+        self._any_joint.set_target_position(target, op_mode)
 
-    def set_maximum_force(self, force: float):
-        self._any_joint.set_maximum_force(force)
+    def set_maximum_force(self, force: float, op_mode=None):
+        self._any_joint.set_maximum_force(force, op_mode)
 
-    def get_position(self):
-        return self._any_joint.get_position()
+    def get_position(self, op_mode=None):
+        return self._any_joint.get_position(op_mode)
 
-    def get_force(self):
-        return self._any_joint.get_force()
+    def get_force(self, op_mode=None):
+        return self._any_joint.get_force(op_mode)
 
 
 class PassiveJoint:
@@ -109,11 +125,11 @@ class PassiveJoint:
     def __init__(self, any_joint: AnyJoint):
         self._any_joint = any_joint
 
-    def get_position(self):
-        return self._any_joint.get_position()
+    def get_position(self, op_mode=None):
+        return self._any_joint.get_position(op_mode)
 
-    def set_position(self, pos: float):
-        self._any_joint.set_position(pos)
+    def set_position(self, pos: float, op_mode=None):
+        self._any_joint.set_position(pos, op_mode)
 
 
 class SphericalJoint:
@@ -121,11 +137,11 @@ class SphericalJoint:
     def __init__(self, any_joint: AnyJoint):
         self._any_joint = any_joint
 
-    def set_matrix(self, matrix):
-        self._any_joint.set_matrix(matrix)
+    def set_matrix(self, matrix, op_mode=None):
+        self._any_joint.set_matrix(matrix, op_mode)
 
-    def get_matrix(self):
-        return self._any_joint.get_matrix()
+    def get_matrix(self, op_mode=None):
+        return self._any_joint.get_matrix(op_mode)
 
 
 class SpringJoint:
@@ -133,20 +149,20 @@ class SpringJoint:
     def __init__(self, any_joint: AnyJoint):
         self._any_joint = any_joint
 
-    def set_target_position(self, target: float):
-        self._any_joint.set_target_position(target)
+    def set_target_position(self, target: float, op_mode=None):
+        self._any_joint.set_target_position(target, op_mode)
 
-    def set_maximum_force(self, force: float):
-        self._any_joint.set_maximum_force(force)
+    def set_maximum_force(self, force: float, op_mode=None):
+        self._any_joint.set_maximum_force(force, op_mode)
 
-    def get_position(self):
-        return self._any_joint.get_position()
+    def get_position(self, op_mode=None):
+        return self._any_joint.get_position(op_mode)
 
-    def get_force(self):
-        return self._any_joint.get_force()
+    def get_force(self, op_mode=None):
+        return self._any_joint.get_force(op_mode)
 
-    def set_target_velocity(self, target: float):
-        self._any_joint.set_target_velocity(target)
+    def set_target_velocity(self, target: float, op_mode=None):
+        self._any_joint.set_target_velocity(target, op_mode)
 
 
 class Joints:

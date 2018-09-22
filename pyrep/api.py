@@ -6,7 +6,6 @@ from .simulation import Simulation
 class VRepApi:
     def __init__(self, client_id):
         self._id = client_id
-        self._def_op_mode = v.simx_opmode_oneshot_wait
         self.joint = Joints(client_id)  # type: Joints
         self.sensor = Sensors(client_id)  # type: Sensors
         self.simulation = Simulation(client_id)  # type: Simulation
