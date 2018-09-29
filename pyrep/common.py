@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from .vrep import vrep as v
 
 class Coordinates:
@@ -32,6 +33,21 @@ class EulerAngles:
 
     def __repr__(self):
         return self.__str__()
+
+
+# Fix vrep angular notation
+# vrep angle: 0 -> 180 -> -180 -> 0
+# fixed angle: 0 -> 360
+def fix_angle_notation(angle):
+    neg = False
+    if angle < 0:
+        neg = True
+        angle = -angle
+    while angle > np.deg2rad(180):
+        angle -= np.deg2rad(180)
+    if neg:
+        angle = np.deg2rad(360) - angle
+    return angle
 
 
 class NotFoundComponentError(Exception):
