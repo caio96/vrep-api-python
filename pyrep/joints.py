@@ -20,8 +20,10 @@ class AnyJoint:
             op_mode = vc.simx_opmode_streaming
         code, force = v.simxGetJointForce(
             self._id, self._handle, op_mode)
-        if code == v.simx_return_ok or code == vc.simx_return_novalue_flag:
+        if code == v.simx_return_ok:
             return force
+        elif code == v.simx_return_novalue_flag:
+            return None
         raise ReturnCommandError(code)
 
     def get_matrix(self, op_mode=None):
@@ -29,8 +31,10 @@ class AnyJoint:
             op_mode = vc.simx_opmode_streaming
         code, matrix = v.simxGetJointMatrix(
             self._id, self._handle, op_mode)
-        if code == v.simx_return_ok or code == vc.simx_return_novalue_flag:
+        if code == v.simx_return_ok:
             return matrix
+        elif code == v.simx_return_novalue_flag:
+            return None
         raise ReturnCommandError(code)
 
     def get_position(self, op_mode=None):
@@ -38,8 +42,10 @@ class AnyJoint:
             op_mode = vc.simx_opmode_streaming
         code, position = v.simxGetJointPosition(
             self._id, self._handle, op_mode)
-        if code == v.simx_return_ok or code == vc.simx_return_novalue_flag:
+        if code == v.simx_return_ok:
             return position
+        elif code == v.simx_return_novalue_flag:
+            return None
         raise ReturnCommandError(code)
 
     def set_maximum_force(self, force, op_mode=None):
@@ -47,7 +53,7 @@ class AnyJoint:
             op_mode = vc.simx_opmode_oneshot
         code = v.simxSetJointForce(
             self._id, self._handle, force, op_mode)
-        if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
+        if code not in (v.simx_return_ok, v.simx_return_novalue_flag):
             raise ReturnCommandError(code)
 
     def set_position(self, position, op_mode=None):
@@ -55,7 +61,7 @@ class AnyJoint:
             op_mode = vc.simx_opmode_streaming
         code = v.simxSetJointPosition(
             self._id, self._handle, position, op_mode)
-        if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
+        if code not in (v.simx_return_ok, v.simx_return_novalue_flag):
             raise ReturnCommandError(code)
 
     def set_target_position(self, target, op_mode=None):
@@ -63,7 +69,7 @@ class AnyJoint:
             op_mode = vc.simx_opmode_streaming
         code = v.simxSetJointTargetPosition(
             self._id, self._handle, target, op_mode)
-        if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
+        if code not in (v.simx_return_ok, v.simx_return_novalue_flag):
             raise ReturnCommandError(code)
 
     def set_target_velocity(self, target, op_mode=None):
@@ -71,7 +77,7 @@ class AnyJoint:
             op_mode = vc.simx_opmode_streaming
         code = v.simxSetJointTargetVelocity(
             self._id, self._handle, target, op_mode)
-        if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
+        if code not in (v.simx_return_ok, v.simx_return_novalue_flag):
             raise ReturnCommandError(code)
 
     def set_matrix(self, matrix, op_mode=None):
@@ -80,7 +86,7 @@ class AnyJoint:
         assert len(matrix) == 12
         code = v.simxSetSphericalJointMatrix(
             self._id, self._handle, matrix, op_mode)
-        if code != v.simx_return_ok and code != vc.simx_return_novalue_flag:
+        if code not in (v.simx_return_ok, v.simx_return_novalue_flag):
             raise ReturnCommandError(code)
 
 
@@ -233,10 +239,10 @@ class Joints:
             vc.sim_jointmode_force)
         return JointWithVelocityControl(joint)
 
-    def _get_joint_with_param(self, name, types, mode) -> AnyJoint:
+    def _get_joint_with_param(self, name, types, joint_mode) -> AnyJoint:
         handle = self._get_object_handle(name)
         joint_type, curr_mode, low_limit, joint_range = self._get_info_about_joint(handle)
-        if joint_type in types and curr_mode == mode:
+        if joint_type in types and curr_mode == joint_mode:
             return AnyJoint(self._id, handle, low_limit, joint_range)
         raise MatchObjTypeError(name)
 

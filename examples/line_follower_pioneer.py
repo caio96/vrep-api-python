@@ -49,8 +49,6 @@ class PioneerP3DX:
 
 with VRepApi.connect("127.0.0.1", 19997) as api:
     robot = PioneerP3DX(api)
-    # black color      :  43
-    # white-gray color : -53
     while True:
         lclr = robot.left_color()
         rclr = robot.right_color()
@@ -60,5 +58,4 @@ with VRepApi.connect("127.0.0.1", 19997) as api:
             robot.rotate_right(0.3)
         else:
             robot.move_forward(0.3)
-
         time.sleep(0.01)

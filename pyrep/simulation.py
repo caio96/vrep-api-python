@@ -9,22 +9,22 @@ class Simulation:
 
     def start(self):
         code = v.simxStartSimulation(self._id, vc.simx_opmode_oneshot_wait)
-        if code != vc.simx_return_ok and code != vc.simx_return_novalue_flag:
+        if code not in (v.simx_return_ok, v.simx_return_novalue_flag):
             raise ReturnCommandError(code)
 
     def resume(self):
         code = v.simxPauseSimulation(self._id, vc.simx_opmode_oneshot_wait)
-        if code != vc.simx_return_ok and code != vc.simx_return_novalue_flag:
+        if code not in (v.simx_return_ok, v.simx_return_novalue_flag):
             raise ReturnCommandError(code)
 
     def pause(self):
         code = v.simxPauseSimulation(self._id, vc.simx_opmode_oneshot_wait)
-        if code != vc.simx_return_ok and code != vc.simx_return_novalue_flag:
+        if code not in (v.simx_return_ok, v.simx_return_novalue_flag):
             raise ReturnCommandError(code)
 
     def stop(self):
         code = v.simxStopSimulation(self._id, vc.simx_opmode_oneshot_wait)
-        if code != vc.simx_return_ok and code != vc.simx_return_novalue_flag:
+        if code not in (v.simx_return_ok, v.simx_return_novalue_flag):
             raise ReturnCommandError(code)
 
     def resume_communication(self):
@@ -47,8 +47,12 @@ class Simulation:
         time = v.simxGetLastCmdTime(self._id)
         return time
 
-    def get_float_signal(self, signal_name):
-        code, signal = v.simxGetFloatSignal(self._id, signal_name , vc.simx_opmode_streaming)
-        if code == vc.simx_return_ok or code == vc.simx_return_novalue_flag:
+    def get_float_signal(self, signal_name, op_mode=None):
+        if op_mode is None:
+            op_mode = vc.simx_opmode_streaming
+        code, signal = v.simxGetFloatSignal(self._id, signal_name, op_mode)
+        if code == vc.simx_return_ok:
             return signal
+        elif code == vc.simx_return_novalue_flag:
+            return None
         raise ReturnCommandError(code)

@@ -6,9 +6,9 @@ from .simulation import Simulation
 class VRepApi:
     def __init__(self, client_id):
         self._id = client_id
-        self.joint = Joints(client_id)  # type: Joints
-        self.sensor = Sensors(client_id)  # type: Sensors
-        self.simulation = Simulation(client_id)  # type: Simulation
+        self.joint = Joints(client_id)
+        self.sensor = Sensors(client_id)
+        self.simulation = Simulation(client_id)
 
     @staticmethod
     def connect(ip, port):

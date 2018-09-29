@@ -37,11 +37,20 @@ class PioneerP3DX:
 
     def sensor_distance(self, sensor_number: int):
         state, coordinate = self._sonar_sensors[sensor_number].read()
+        # if streamming has not begun
+        while coordinate is None:
+            state, coordinate = self._sonar_sensors[sensor_number].read()
+            time.sleep(0.1)
         if state == 0:
             return -1
         return coordinate.z
 
     def get_position(self):
+        position = self._ground_truth.get_position()
+        # if streamming has not begun
+        while position is None:
+            position = self._ground_truth.get_position()
+            time.sleep(0.1)
         return self._ground_truth.get_position()
 
 
